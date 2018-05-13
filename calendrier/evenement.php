@@ -14,27 +14,62 @@
 			$date = htmlentities($_GET['d']);
 			$tabDate = explode('/', $date);
 			
-			$req = "SELECT * FROM evenements WHERE id_evenement IN (SELECT id_evenement FROM date_evenement WHERE jour_evenement=".$tabDate[0]." AND mois_evenement=".$tabDate[1]." AND annee_evenement=".$tabDate[2].")";
-			
+			$req = "SELECT * FROM date_evenement WHERE id_evenement IN (SELECT id_evenement FROM date_evenement WHERE jour_evenement=".$tabDate[0]." AND mois_evenement=".$tabDate[1]." AND annee_evenement=".$tabDate[2].")";
+			//echo $req ;
+
 			include("sql_connect.php");
+
+			$date_evenement = mysqli_query($connection,$req);
 			
-			$evenements = mysqli_query($connection,$req);
-			
-			if(mysqli_num_rows($evenements)) {
-				while($evenement = mysqli_fetch_array($evenements)) {
-					echo '
-						<table>
+			if(mysqli_num_rows($date_evenement)) {
+				while($date_evenements = mysqli_fetch_array($date_evenement)) {
+					if(!empty($date_evenements['photo']))
+					{
+										echo '
+						<table class="listeEvent">
+							
 							<tr>
-								<th>'.$evenement['titre_evenement'].'</th>
+								<th><h2>'.$date_evenements['jour_evenement'].'/'.$date_evenements['mois_evenement'].'/'.$date_evenements['annee_evenement'].'</h2>	
+								</th> 
+							<tr>
+							</tr>
+								<th><h3>'
+								.$date_evenements['titre_evenement'].'</h3>
+								</th>
 							</tr>
 							<tr>
-								<td>'.$evenement['contenu_evenement'].'</td>
+								<td><h4>
+								'.$date_evenements['contenu_evenement'].'</h4>
+								<p align="center"> <img height ="150" width="150" src="data:image;base64,'.base64_encode($date_evenements['photo']).'"></br></td>
 							</tr>
-						</table>
-						
-						<br/><br/>
+						</table>						
 					';
+					}
+					else
+					{
+					echo '
+						<table class="listeEvent">
+							
+							<tr>
+								<th><h2>'.$date_evenements['jour_evenement'].'/'.$date_evenements['mois_evenement'].'/'.$date_evenements['annee_evenement'].'</h2>	
+								</th> 
+							<tr>
+							</tr>
+								<th><h3>'
+								.$date_evenements['titre_evenement'].'</h3>
+								</th>
+							</tr>
+							<tr>
+								<td><h4>
+								'.$date_evenements['contenu_evenement'].'</h4>
+										</td></tr>
+
+						</table>
+											
+					';
+					}	
 					
+					//echo $date_evenements['photo'];
 				}
 				
 			} else {
@@ -44,7 +79,7 @@
 			mysqli_close($connection);
 		}
 		
-		echo '<p class="centre"><a href="calendrier.php">Revenir au calendrier</a></p>'
+		echo '<p class="centre"><a href="calendrier.php"><img src="design/retour.png"/p>'
 	?>
 </body>
 </html>

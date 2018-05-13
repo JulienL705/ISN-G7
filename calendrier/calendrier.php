@@ -1,12 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-<!-- affiche image de fond  -->
-<style>
-body{margin:0;padding:0;background: url(fond1.jpg) no-repeat center fixed; /*image de fond*/
-background-size: cover; /*taille image de fond*/
-	}
-</style> 
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -16,11 +10,12 @@ background-size: cover; /*taille image de fond*/
 <body>
 	<!--  affichage du titre -->
 	<h1>Calendrier</h1>
-	<h1><?php echo ("la date du jour est :").date('d/m/Y') ?></h1>
+	<h1><?php echo ("Nous sommes le :").date('d/m/Y') ?></h1>
 	<ul>
 		<!--affichage  raccourci menu   -->
-    	<h1><a href="admin/ajoutevent.php">Ajouter un événement</a></br>
-        <a href="admin/supprevent.php">Supprimer un événement</a></h1>
+    	<h1><a href="ajoutevent.php"><img src="design/ajouter.png">ajouter un évenement</a>
+        <a> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp </a> <!-- espace-->
+        <a href="supprevent.php"><img src="design/supprimer.png">supprimer un évenement</a></h1>
     </ul>  
 <?php
 	#  creation de la fonction  gestion des evenements ----------------
@@ -31,7 +26,7 @@ background-size: cover; /*taille image de fond*/
 		
 		include("sql_connect.php");
 		
-		$sql = 'SELECT DISTINCT jour_evenement, titre_evenement FROM date_evenement c, evenements e WHERE mois_evenement='.$mois.' AND annee_evenement='.$annee.' AND c.id_evenement = e.id_evenement ORDER BY jour_evenement';
+		$sql = 'SELECT DISTINCT jour_evenement, titre_evenement FROM date_evenement WHERE mois_evenement='.$mois.' AND annee_evenement='.$annee.' ORDER BY jour_evenement';
 		
 
 		$query = mysqli_query($connection,$sql) or die("Une requête a échouée.");
@@ -115,10 +110,10 @@ background-size: cover; /*taille image de fond*/
 	?>
     
 	<table class="calendrier">
-		<!--affichage du moi en cours  est selection  des mois suivant ou precedant  -->
-		<caption><h1><?php echo '<a href="?m='.$mois_avant.'&amp;y='.$annee_avant.'"><<</a>  '.$m[$numero_mois].' '.$annee.'  <a href="?m='.$mois_apres.'&amp;y='.$annee_apres.'">>></a>'; ?></h1></caption>
+		<!--affichage du mois en cours  est selection  des mois suivant ou precedant  -->
+		<caption><h1><?php echo '<a href="?m='.$mois_avant.'&amp;y='.$annee_avant.'"><img src="design/fg.png"></a>  '.$m[$numero_mois].' '.$annee.'  <a href="?m='.$mois_apres.'&amp;y='.$annee_apres.'"><img src="design/fd.png"></a>'; ?></h1></caption>
 		
-		<tr><th>Lu</th><th>Ma</th><th>Me</th><th>Je</th><th>Ve</th><th>Sa</th><th>Di</th></tr>
+		<tr><th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th><th>Samedi</th><th>Dimanche</th></tr>
 	<?php
 		// Ecriture de la 1ère ligne
 		echo '<tr>';
@@ -170,6 +165,23 @@ background-size: cover; /*taille image de fond*/
 			}
 			echo '</tr>';
 		}
+
+#--------------------------suppression auto 1 mois avant 
+		$ref=1;
+		for($i=0; $i<$ref; $i++){ #pour le faire 1 seule fois
+		$mois=date('m');
+		$mois_suppr= date("m",strtotime("- 1 month")); 
+		//echo $mois_suppr;
+		$annee=date('Y');
+		include("sql_connect.php");
+		$suppr='DELETE FROM date_evenement WHERE mois_evenement<='.$mois_suppr.' AND annee_evenement<='.$annee.''; #requete de suppr
+		//echo $suppr;
+		$query = mysqli_query($connection,$suppr) or die("Une requête a échouée.");
+		mysqli_close($connection);
+	}
+#---------------------------------
+
+
 	?>
 	</table>
 	

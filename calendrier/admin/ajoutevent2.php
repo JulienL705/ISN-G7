@@ -125,21 +125,21 @@ if (!empty($_FILES))
 
 // enregistrement dans mysql 
 //test si un lien selecte 
-//if (!empty($_FILES['envoie']))
-//{
+if (!empty($_FILES['envoie']))
+{
 	$img = addcslashes($_FILES['img']['tmp_name']);
 	$nom_img= addcslashes($_FILES['img']['name']);
 	$img_photo = file_get_contents($img);
 	$img_photo = base64_encode($img);
 	include ("sql_connect.php"); // appel connection dbase
 	$requette = 'INSERT INTO image (nom_image,photo) VALUES ('$img','$img_photo')';
-	$resultat = mysqli_query($connection,$requette);
+	echo $requette;
+	$resultat ='mysqli_query($connection,$requette)';
 	if ($resultat)
-		{echo "<br/>Image sauvegardée.";}
-	else
-		{echo "<br/> echec lors de la sauvegarde";}
-	mysqli_close ($connection);
-//}
+		{echo "<br/>Image sauvegardée."}
+	else{echo "<br/> echec lors de la sauvegarde"}
+	close ($connection)
+}
 //
 //$adresse = $img['tmp_name'];
 //echo $img ;

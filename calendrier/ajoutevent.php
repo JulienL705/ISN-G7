@@ -1,11 +1,10 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 
 <!-- affiche image de fond  -->
 <style>
-body{margin:0;padding:0;background: url(star7.jpg) no-repeat center fixed; /*image de fond*/
+body{margin:0;padding:0;background: url(..design/fond5.png) no-repeat center fixed; /*image de fond*/
 background-size: cover; /*taille image de fond*/
 	}
 </style> 
@@ -37,31 +36,47 @@ background-size: cover; /*taille image de fond*/
 				
 				$timestampDiff = $timestampFin - $timestampDebut;
 				$nbreJours = intval($timestampDiff / 86400)+1;
-				
 				if($nbreJours <= 0) $nbreJours = 1;
+
+
+				//&& !empty($_POST['img']
 				
 				
-				if(!empty($titre) && !empty($description)) {
+				
+				if(!empty($titre) && !empty($description) ) {
 					// Traitement de l'enregistrement de l'événement
 					$identifiantCommun = time();
 					$timeDuJour = $timestampDebut;
 					
 					include("sql_connect.php");
-					
+					//print_r($_FILES);
+					//$img = $_FILES ['img'];
+					//$adresse_image = $img['tmp_name'];
+					//$nom_image = $img['img'];
+					if (!empty($_FILES['img']['name']))
+					{
+					$nom_photo= addslashes($_FILES['img']['name']);
+					$tmp_photo = addslashes(file_get_contents($_FILES['img']['tmp_name']));
+					//$type_photo = base64_encode($img_photo);
+					$type_photo=addslashes($_FILES['img']['type']);
+					}
+					else
+					{
+					$nom_photo= "";
+					$tmp_photo= "";
+					}
+
 					for($i=0 ; $i<$nbreJours ; $i++) {
-						$req = "INSERT INTO date_evenement  VALUES ('', ".date('d', $timeDuJour).", ".date('m', $timeDuJour).", ".date('Y', $timeDuJour).", $identifiantCommun)";
-						echo $req;
+						$req = "INSERT INTO date_evenement  VALUES ('', ".date('d', $timeDuJour).", ".date('m', $timeDuJour).", ".date('Y', $timeDuJour).", $identifiantCommun, '$titre', '$description','$tmp_photo','$nom_photo')";
+						//echo $req;
 						mysqli_query($connection,$req) or die(mysqli_error($connection));
 						
 						$timeDuJour += 86400; // On augmente le timestamp d'un jour
 					}
-					
-					$req = "INSERT INTO evenements VALUES ($identifiantCommun, '$titre', '$description')";
-					mysqli_query($connection,$req) or die(mysqli_error($connection));
-					
+										
 					mysqli_close($connection);
 					
-					echo '<ul><li>Evénement enregistré !</li></ul>';
+					echo '<ul></ul>';
 				} else {
 					echo '<ul><li>Titre ou description de l\'événement non renseigné.</li></ul>';
 				}
@@ -76,7 +91,7 @@ background-size: cover; /*taille image de fond*/
     <!-- Formulaire d'envoi -->
 	<h1>Ajouter un événement</h1>
     
-    <form method="post" action="ajoutevent.php">
+    <form method="post" action="ajoutevent.php" enctype = "multipart/form-data">
     	<table id="tabAjoutEvent">
         	<tr>
             	<td><label>Du : <input type="text" name="debut" value="<?php echo $dateDebut ?>" /></label></td>
@@ -95,84 +110,18 @@ background-size: cover; /*taille image de fond*/
                 </td>
             </tr>
             <tr>
-            	<td colspan="2"><input type="submit" name="envoi" value="Envoyer"/></td>
+            	<td colspan="2"><input type = "file" name = "img" /><br></br>
+            					<input type="submit" name="envoi" value="Enregistrer"/>
+            				</td>
             </tr>
-       </table>
-    </form>
+		</table>
+	</form>
     
-   
+
 </body>
+  
+ <p class="centre"><br/><a href="calendrier.php"><img src="design/retour.png"></a></p>
 
-<!---insertion image  liée à  l'evenement---->
-
-<center></br></br></br></br>
-<form action = "" method = "POST" enctype = "multipart/form-data">
-         <input type = "file" name = "img" />
-         <input type = "submit" name = "envoie" value = "enregistrer votre image :" />
-				
-</form>
-</center>
-<?php 
-
-//  test si lle fichier est  non nul et enregistre  l image sous le  meme nom dans repertoire images
-if (!empty($_FILES))
-{
-	$img = $_FILES ['img'];
-	move_uploaded_file($img['tmp_name'], "images/".$img['name']);
-}
-
-// ----------------------------------
-
-// enregistrement dans mysql 
-//test si un lien selecte 
-//if (!empty($_FILES['envoie']))
-//{
-	$img = addcslashes($_FILES['img']['tmp_name']);
-	$nom_img= addcslashes($_FILES['img']['name']);
-	$img_photo = file_get_contents($img);
-	$img_photo = base64_encode($img);
-	include ("sql_connect.php"); // appel connection dbase
-	$requette = 'INSERT INTO image (nom_image,photo) VALUES ('$img','$img_photo')';
-	$resultat = mysqli_query($connection,$requette);
-	if ($resultat)
-		{echo "<br/>Image sauvegardée.";}
-	else
-		{echo "<br/> echec lors de la sauvegarde";}
-	mysqli_close ($connection);
-//}
-//
-//$adresse = $img['tmp_name'];
-//echo $img ;
-//$req = "INSERT INTO image VALUES('' ,'$adresse')";
-//echo $req;
-//$exec = mysqli_query($connection,$req);
-// verif  du fichier image
-	echo"<pre>";
-    print_r($_FILES);
-	echo"</pre>"; 
-?>
-<!--
-<script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
-<script type='text/javascript'>
-$(window).load(function(){
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-             
-            reader.onload = function (e) {
-                $('#adresse').attr('src', e.target.result);
-            }
-             
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-     
-    $("#photo1").change(function(){
-        readURL(this);
-    });
-});
- -->
- <p class="centre"><br/><a href="calendrier.php">Revenir à l'accueil</a></p>
 </script>
 
 </html>
